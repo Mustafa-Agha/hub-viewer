@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <title>HubViewer</title>
+</head>
+<body>
+    
+    <div class="ui container" style="width: 100%;">
+        <div class="ui placeholder segment" style="height: 275px;">
+            <div class="ui grid">
+                <div class="three column row">
+    
+                    <div class="column">
+                        <div class="ui items">
+                            <div class="item">
+                              <div class="avatar">
+                                <img src="./assets/images/profile.png">
+                              </div>
+                              <div class="content" style="padding: 20px 0px 20px 20px;">
+                                <a href="https://github.com/Mustafa-Agha/hub-viewer" target="_blank" rel="noreferrer noopener" class="header">Mustafa Agha</a>
+                                <div class="meta">
+                                  <span>Full Stack Developer</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="ui divider" style="margin-bottom: 0;"></div>
+                            <div class="item" style="margin: 0; justify-content: center; max-height: 100px;">
+                                <img style="object-fit: cover;" class="ui small image" src="./assets/images/logo.png">
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="column">
+                        <h3 class="ui header">Allow Remote Control</h3>
+                        <div class="ui comments">
+
+                            <div class="comment" style="border-left: 1px solid black; padding: 10px;">
+                              <div class="content">
+                                <div class="metadata" style="font-weight: bold; margin-left: 0;">
+                                  <span class="date">Your ID</span>
+                                </div>
+                                <div class="text">
+                                  code
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="comment" style="border-left: 1px solid black; padding: 10px;">
+                                <div class="content">
+                                  <div class="metadata" style="font-weight: bold; margin-left: 0;">
+                                    <span class="date">Password</span>
+                                  </div>
+                                  <div class="text">
+                                    code
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="column">
+                        <h3 class="ui header">View Remote Computer</h3>
+                        <form class="ui form" onsubmit="connect();">
+                            <div class="field">
+                              <label>Partner ID</label>
+                              <input type="text" name="partnerId" placeholder="Partner ID">
+                            </div>
+                            <div class="grouped fields">
+                                <div class="field">
+                                  <div class="ui radio checkbox">
+                                    <input id="view" type="radio" name="connect" checked="checked">
+                                    <label for="view" style="cursor: default;">Remote View</label>
+                                  </div>
+                                </div>
+                                <div class="field">
+                                  <div class="ui radio checkbox">
+                                    <input id="share" type="radio" name="connect">
+                                    <label for="share" style="cursor: default;">Share Screen</label>
+                                  </div>
+                                </div>
+                            </div>
+                            <button class="ui button" type="submit" style="margin: 0;">
+                                <i class="exchange alternate icon"></i> Connect
+                            </button>
+                        </form>
+                    </div>
+    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="./assets/js/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+</body>
+</html>
