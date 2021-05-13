@@ -10,7 +10,7 @@ let room = null;
 function createWindow() {
   win = new BrowserWindow({
     width: 800,
-    height: 768,
+    height: 400,
     icon: path.join(__dirname + '/public/assets/images/favicon2.png'),
     webPreferences: {
       contextIsolation: false,
