@@ -1,12 +1,21 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
+  "name": "hub-viewer-server",
+  "version": "1.0.1",
+  "description": "Server for hub-viewer-client to share your screen desktop with other clients",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "hub-viewer"
+  ],
+  "author": "sasa agha",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^4.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
 }

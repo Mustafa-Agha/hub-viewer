@@ -1,18 +1,51 @@
 {
   "name": "hub-viewer-client",
-  "version": "1.0.1",
-  "description": "Share your screen desktop with other clients",
-  "main": "app.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "keywords": ["hub-viewer"],
-  "author": "sasa agha",
-  "license": "MIT",
+  "version": "0.1.1",
+  "description": "HubViewer screencast client",
+  "private": true,
+  "homepage": "./",
+  "main": "electron.js",
   "dependencies": {
+    "@testing-library/jest-dom": "^5.12.0",
+    "@testing-library/react": "^11.2.6",
+    "@testing-library/user-event": "^12.8.3",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^12.20.13",
+    "@types/react": "^17.0.5",
+    "@types/react-dom": "^17.0.4",
     "electron": "^12.0.7",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3",
+    "sass": "^1.32.13",
     "screenshot-desktop": "^1.12.3",
-    "socket.io-client": "^4.0.2",
-    "uuid": "^8.3.2"
+    "socket.io-client": "^4.1.1",
+    "typescript": "^4.2.4",
+    "uuid": "^8.3.2",
+    "web-vitals": "^1.1.2"
+  },
+  "scripts": {
+    "start": "npm run start:react & npm run start:electron",
+    "start:electron": "npx electron .",
+    "start:react": "react-scripts start",
+    "build:react": "react-scripts build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
