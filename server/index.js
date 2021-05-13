@@ -8,34 +8,50 @@ let rooms = {};
 
 io.on("connection", (socket) => {
     socket.on("create-cast", ({id, password}) => {
-        socket.join(id);
-        rooms[id] = {
-            user: socket.id,
-            password: password,
-        };
-        console.log("user", socket.id, "created room:", id);
+        try {
+            socket.join(id);
+            rooms[id] = {
+                user: socket.id,
+                password: password,
+            };
+            console.log("user", socket.id, "created room:", id);
+        } catch (err) {
+            console.error(err.stack || err);
+        }
     });
 
     socket.on("join-cast", ({id, password}) => {
-        if (rooms[id] && rooms[id]['password'] === password) {
-            socket.join(id);
-            console.log("user", socket.id, "joined room:", id);
+        try {
+            if (rooms[id] && rooms[id]['password'] === password) {
+                socket.join(id);
+                console.log("user", socket.id, "joined room:", id);
+            }
+        } catch (err) {
+            console.error(err.stack || err);
         }
     });
 
     socket.on("screen-data", (data) => {
-        data = JSON.parse(data);
-        const room = data.room;
-        const imgStr = data.image;
+        try {
+            data = JSON.parse(data);
+            const room = data.room;
+            const imgStr = data.image;
 
-        socket.broadcast.to(room).emit('screen-data', imgStr);
+            socket.broadcast.to(room).emit('screen-data', imgStr);
+        } catch (err) {
+            console.error(err.stack || err);
+        }
     });
 
     socket.on("leave-room", ({id, password}) => {
-        if ((rooms[id] && rooms[id]['password'] === password)
-            || (rooms[id] && rooms[id]['user'] === socket.id)) {
-            socket.leave(id);
-            console.log("user", socket.id, "left room:", id);
+        try {
+            if ((rooms[id] && rooms[id]['password'] === password)
+                || (rooms[id] && rooms[id]['user'] === socket.id)) {
+                socket.leave(id);
+                console.log("user", socket.id, "left room:", id);
+            }
+        } catch (err) {
+            console.error(err.stack || err);
         }
     });
 });
