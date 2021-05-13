@@ -1,27 +1,26 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const screenshot = require('screenshot-desktop');
 
 const socket = require('socket.io-client')('http://localhost:5000');
 let interval;
+let win = null;
+let room = null;
 
 function createWindow() {
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 800,
     height: 300,
-    icon: path.join(__dirname + '/public/images/favicon2.png'),
+    icon: path.join(__dirname + '/public/assets/images/favicon2.png'),
     webPreferences: {
-      contextIsolation: true,
+      contextIsolation: false,
       nodeIntegration: true,
-      preload: path.join(__dirname, 'preload.js')
     },
   });
 
-  win.loadURL('http://localhost:3000/');
-  // win.removeMenu();
+  win.loadURL('http://localhost:3000');
+  win.removeMenu();
   win.center();
-  // win.setResizable(false);
 }
 
 app.whenReady().then(() => {
@@ -38,48 +37,42 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    socket.emit('leave-room', room);
     app.quit();
   }
 });
 
-ipcMain.on('connect', (event, arg) => {
-  //TODO: capture continuous screen shots
-  const uuid = uuidv4();
-  socket.emit('join-message', uuid);
-  event.replay('uuid', uuid);
+ipcMain.on('connect', async (event, { id, password, type }) => {
+  room = {id, password};
+  if (type === 'share') {
+    socket.emit('create-cast', {id, password});
+    interval = setInterval(async () => {
+      try {
+        const img = await screenshot();
+        const imgStr = img.toString('base64');
+        let obj = {};
 
-  //TODO: Broadcast to all users
-});
+        obj['room'] = id;
+        obj['image'] = imgStr;
 
-ipcMain.on('disconnect', (event, arg) => {
-  //TODO: Stop broadcasting & screen capture
-});
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-// Handle window controls via IPC
-ipcMain.on('windowControls:maximize', (ipcEvent) => {
-  const window = findBrowserWindow(ipcEvent);
-  if (window.isMaximized()) {
-    window.restore();
-  } else {
-    window.maximize();
+        socket.emit('screen-data', JSON.stringify(obj));
+      } catch (err) {
+        console.error(err.stack || err);
+        process.exit(1);
+      }
+    }, 1000);
+  } else if (type === 'view') {
+    let opened = false;
+    socket.emit('join-cast', {id, password});
+    socket.on('screen-data', (msg) => {
+      event.reply('screen-cast', 'data:image/png;base64,' + msg);
+      if (!opened) win.loadURL('http://localhost:3000/cast');
+      opened = true;
+    });
   }
 });
 
-ipcMain.on('windowControls:minimize', (ipcEvent) => {
-  const window = findBrowserWindow(ipcEvent);
-  window.minimize();
+ipcMain.on('disconnect', (_event, {id, password}) => {
+  clearInterval(interval);
+  socket.emit('leave-room', {id, password});
 });
-
-ipcMain.on('windowControls:close', (ipcEvent) => {
-  const window = findBrowserWindow(ipcEvent);
-  window.close();
-});
-
-// ipcEvent.sender is the webContents that sent the message
-// use BrowserWindow.fromWecContents to get the associated BrowserWindow instance
-function findBrowserWindow(ipcEvent) {
-  return BrowserWindow.fromWebContents(ipcEvent.sender);
-}

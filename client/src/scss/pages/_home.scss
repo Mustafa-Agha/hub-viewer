@@ -47,3 +47,41 @@
 .ui.radio.checkbox input:checked~label:after {
     background-color: $white-color!important;
 }
+
+.undo.icon {
+    color: $white-color!important;
+    &:hover {
+        opacity: .5;
+        transform: scale(1.1);
+        transition: .5s;
+    }
+}
+
+.expand.icon {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer!important;
+    color: $white-color;
+    font-size: 24px;
+    z-index: 1000;
+
+    &:hover {
+        opacity: .6;
+        transition: .6s;
+    }
+}
+
+#pass-loader {
+    display: inline-block;
+    cursor: pointer;
+    outline: none!important;
+    border: none!important;
+    box-shadow: none!important;
+    background: transparent!important;
+}
+
+#pass-text {
+    padding-right: 0!important;
+    padding-left: 0!important;
+}
