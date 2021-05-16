@@ -1,18 +1,14 @@
-@import 'abstracts/variables';
-@import 'abstracts/mixins';
+#root {
+    height: 100%;
+}
 
-@import 'base/reset';
-@import 'base/typography';
+.showMeHow {
+    display: block;
+    background-color: white;
+    font-size: 12px;
+    margin-top: 3px;
+}
 
-@import 'layout/footer';
-@import 'layout/grid';
-@import 'layout/header';
-@import 'layout/sidebar';
-
-@import 'components/buttons';
-@import 'components/dots';
-
-@import 'pages/home';
-
-@import 'themes/dark';
-@import 'themes/light';
+.showMeHow:hover {
+    background-color: #00000005;
+}
