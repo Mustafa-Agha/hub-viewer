@@ -1,6 +1,6 @@
 {
   "name": "hub-viewer-client",
-  "version": "0.1.1",
+  "version": "1.0.1",
   "description": "HubViewer screencast client",
   "private": true,
   "homepage": "./",
@@ -57,6 +57,7 @@
     ]
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.1",
     "@types/react-router-dom": "^5.1.7",
     "@types/uuid": "^8.3.0"
   }

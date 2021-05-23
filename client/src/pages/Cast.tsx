@@ -5,13 +5,15 @@ import { Image, Spin } from 'antd';
 const electron = window.require('electron');
 const ipcRenderer = electron.ipcRenderer;
 
-const Cast: FC = () => {
+const Cast: FC = (props: any) => {
   const [src, setSrc] = useState('/images/favicon.png');
   const [spinning, setSpinning] = useState(true);
 
   useEffect(() => {
-    ipcRenderer.send('view', {});
-  }, []);
+    const { match } = props;
+    const { password, id } = match.params;
+    ipcRenderer.send('view', {id, password});
+  }, [props]);
 
   ipcRenderer.on('screen-cast', (event: any, img: any) => {
     setSrc(img);

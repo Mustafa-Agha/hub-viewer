@@ -3,7 +3,21 @@ const path = require('path');
 const screenshot = require('screenshot-desktop');
 const jwt = require('jsonwebtoken');
 
-const socket = require('socket.io-client')('http://localhost:5000');
+const jwt_secret = process.env.JWT_SECRET || '2e8bf84eb85b8c62cb26ca36feab31ce772da90fdf98b4f5ab22f7be12a939ea';
+
+// TODO: ADD LOGIN AUTH PRIVILEGES
+const token = jwt.sign({ website: 'https://hubviewer.dev-hub.cf' }, jwt_secret);
+
+const socket = require('socket.io-client')('http://localhost:5000', {
+  transportOptions: {
+    polling: {
+      extraHeaders: {
+        'Authorization': 'Bearer ' + token,
+      },
+    },
+  },
+});
+
 let interval;
 let shareWin = null;
 let authWin = null;
@@ -46,34 +60,42 @@ app.on('window-all-closed', () => {
 });
 
 ipcMain.on('create-room', (event, arg) => {
-  socket.emit('create-room', arg, (response) => {
+  socket.emit('create-room', {id: arg['id'], password: arg['token']}, (response) => {
     console.log('create-room', response);
     if (response.status === 'fail') {
       return event.reply('error-create-room', response);
     }
 
-    socket.on('share-screen', ({id, password, client}) => {
-      if (parseInt(arg['id']) === parseInt(id) && arg['password'] === password) {
-        shareWin = new BrowserWindow({
-          width: 350,
-          height: 180,
-          title: 'Share Scree Request',
-          webPreferences: {
-            contextIsolation: false,
-            nodeIntegration: true,
-          },
-        });
+    socket.on('auth-user', ({id, password, client}) => {
+      jwt.verify(password, arg['password'], function(err) {
+        if (err) {
+          socket.emit('user-authorized', {id, isAuth: false}, rb => {
+            console.log(rb);
+          });
+        }
+        socket.emit('user-authorized', {id, token: password, client, isAuth: true}, rb => {
+          console.log(rb);
+          shareWin = new BrowserWindow({
+            width: 350,
+            height: 180,
+            title: 'Share Scree Request',
+            webPreferences: {
+              contextIsolation: false,
+              nodeIntegration: true,
+            },
+          });
+        
+          shareWin.loadURL('http://localhost:3000/share/' + id + '/' + arg['password']);
+          shareWin.removeMenu();
+          shareWin.center();
+          shareWin.setResizable(false);
+          shareWin.setMaximizable(false);
       
-        shareWin.loadURL('http://localhost:3000/share/' + id + '/' + password + '/' + client);
-        shareWin.removeMenu();
-        shareWin.center();
-        shareWin.setResizable(false);
-        shareWin.setMaximizable(false);
-    
-        shareWin.on('closed', () => {
-          shareWin = null;
+          shareWin.on('closed', () => {
+            shareWin = null;
+          });
         });
-      }
+      });
     });
   });
 });
@@ -83,10 +105,11 @@ ipcMain.on('share', (event, {id, password}) => {
     try {
       const img = await screenshot();
       const imgStr = img.toString('base64');
+      const token = jwt.sign(imgStr, password);
       let obj = {};
 
       obj['room'] = id;
-      obj['image'] = imgStr;
+      obj['image'] = token;
 
       socket.emit('screen-data', JSON.stringify(obj));
     } catch (err) {
@@ -127,8 +150,8 @@ ipcMain.on('connect', async (event, {id}) => {
   });
 });
 
-ipcMain.on('auth', async (event, {id, password}) => {
-  socket.emit('auth-room', {id, password}, (response) => {
+ipcMain.on('auth', async (event, {id, password, token}) => {
+  socket.emit('auth-confirm', {id, password: token}, (response) => {
     console.log('auth-room', response);
     if (response.status === 'fail') {
       return event.reply('error-auth', response);
@@ -144,7 +167,7 @@ ipcMain.on('auth', async (event, {id, password}) => {
       },
     });
   
-    castWin.loadURL('http://localhost:3000/cast');
+    castWin.loadURL('http://localhost:3000/cast/' + id + '/' + password);
     castWin.removeMenu();
     castWin.center();
     castWin.setMinimumSize(800, 500);
@@ -155,9 +178,16 @@ ipcMain.on('auth', async (event, {id, password}) => {
   });
 });
 
-ipcMain.on('view', (event, arg) => {
-  socket.on('screen-data', (msg) => {
-    event.reply('screen-cast', 'data:image/png;base64,' + msg);
+ipcMain.on('view', (event, {id, password}) => {
+  socket.emit('join', {id}, (joined) => {
+    if (joined) {
+      socket.on('screen-data', (msg) => {
+        jwt.verify(msg, password, function(err, decoded) {
+          if (err) console.error(err.message)
+          event.reply('screen-cast', 'data:image/png;base64,' + decoded);
+        });
+      });
+    }
   });
 });
 
@@ -182,7 +212,6 @@ ipcMain.on('close-cast', () => {
   }
 });
 
-ipcMain.on('disconnect', (_event, {id, password}) => {
+ipcMain.on('disconnect', (_event) => {
   clearInterval(interval);
-  socket.emit('leave-room', {id, password});
 });

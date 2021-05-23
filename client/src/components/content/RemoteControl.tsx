@@ -2,6 +2,7 @@ import { FC, useState, useEffect, ChangeEvent } from 'react';
 import { Row, Col, Typography, List, Form, Radio, Input, Button, Space } from 'antd';
 import { ReloadOutlined, SyncOutlined, SwapOutlined } from '@ant-design/icons';
 import { v4 as uuidv4 } from 'uuid';
+import jwt from 'jsonwebtoken';
 
 
 const { Title, Text } = Typography;
@@ -22,7 +23,8 @@ const RemoteControl: FC = () => {
         let id = Math.floor(100000000 + Math.random() * 900000000);
         setPassword(password);
         setID(id);
-        ipcRenderer.send('create-room', { id: id, password: password });
+        let token = jwt.sign({id: id}, password);
+        ipcRenderer.send('create-room', { id: id, password: password, token });
     }, []);
 
     ipcRenderer.on('error-create-room', (event: any, arg: any) => {
@@ -56,7 +58,8 @@ const RemoteControl: FC = () => {
     const handleConnect = async () => {
         try {
             if (!!partnerID && parseInt(partnerID.split(' ').join(''))) {
-                ipcRenderer.send('connect', { id: parseInt(partnerID.split(' ').join('')), password: password });
+                let token = jwt.sign({id: id}, password);
+                ipcRenderer.send('connect', { id: parseInt(partnerID.split(' ').join('')), password: token });
             }
         } catch (err) {
             console.error(err.stack || err);

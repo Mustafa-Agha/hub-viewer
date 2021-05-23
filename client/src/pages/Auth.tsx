@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Input, Button, Row, Col } from 'antd';
+import jwt from 'jsonwebtoken';
 
 const electron = window.require('electron');
 const ipcRenderer = electron.ipcRenderer;
@@ -18,8 +19,9 @@ const Auth: FC = (props: any) => {
     try {
       const { match } = props;
       const { id } = match.params;
+      let token = jwt.sign({id: id}, password);
 
-      ipcRenderer.send('auth', {id, password});
+      ipcRenderer.send('auth', {id, password: password, token});
       ipcRenderer.send('close-auth', {});
     } catch (err) {
       console.error(err.stack || err);

@@ -8,12 +8,12 @@ const electron = window.require('electron');
 const ipcRenderer = electron.ipcRenderer;
 
 const Share: FC = (props: any) => {
-    const [{id, password, client}, setState] = useState({id: '', password: '', client: ''});
+    const [{id, password}, setState] = useState({id: '', password: ''});
 
     useEffect(() => {
         const { match } = props;
-        const { id, password, client } = match.params;
-        setState({id, password, client});
+        const { id, password } = match.params;
+        setState({id, password});
     }, [props]);
 
     const shareScreen = () => {
@@ -30,7 +30,7 @@ const Share: FC = (props: any) => {
         <Row style={{ padding: '20px' }} justify="space-around">
             <Col span={24}>
                 <Text style={{ display: 'block' }} type="secondary">
-                    This client: ({client}) asks for your permission to share screen of your PC to room: {id} with password: {password}
+                    Share screen of your PC to room: {id} with password: {password}
                 </Text>
                 <Button style={{ marginRight: '20px', marginTop: '20px' }} onClick={shareScreen} type="primary">Share</Button>
                 <Button style={{ marginTop: '20px' }} onClick={denyShare} danger>Deny</Button>

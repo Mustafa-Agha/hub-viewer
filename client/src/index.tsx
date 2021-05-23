@@ -27,8 +27,8 @@ render(
           <Switch>
             <Route exact path="/" component={App} />
             <Route path="/auth/:id" component={Auth} />
-            <Route path="/cast" component={Cast} />
-            <Route path="/share/:id/:password/:client" component={Share} />
+            <Route path="/cast/:id/:password" component={Cast} />
+            <Route path="/share/:id/:password" component={Share} />
           </Switch>
         </Router>
     </StoreContext.Provider>,
