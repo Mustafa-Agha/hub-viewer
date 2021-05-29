@@ -12,7 +12,7 @@ const { Footer, Sider, Content } = Layout;
 
 const App: FC = () => {
   const { mainStore } = useStore();
-  const { selectedKey } = mainStore;
+  const { selectedKey, footerMsg, footerType } = mainStore;
 
   const renderContent = () => {
     switch (parseInt(selectedKey)) {
@@ -21,7 +21,7 @@ const App: FC = () => {
       case 5:
         return <GettingStarted />;
     }
-  }
+  };
 
   return (
     <Layout style={{ height: '100%' }}>
@@ -29,16 +29,9 @@ const App: FC = () => {
         <SideBar />
       </Sider>
       <Layout>
-        <Content>
-          {renderContent()}
-        </Content>
+        <Content>{renderContent()}</Content>
         <Footer style={{ textAlign: 'center', borderTop: '1px solid #fff' }}>
-          <Badge status="success" text="Ready to connect (secure connection)" />
-          {/* <Badge status="warning" text="Connecting..." />
-          <Badge status="warning" text="Incomming connection..." />
-          <Badge status="warning" text="Awaiting authenticating" />
-          <Badge status="error" text="Authenticating failed" />
-          <Badge status="error" text="This partner doesn't accept incoming connections" /> */}
+          <Badge status={footerType} text={footerMsg} />
         </Footer>
       </Layout>
     </Layout>
