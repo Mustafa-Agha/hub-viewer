@@ -7,7 +7,7 @@ const ipcRenderer = electron.ipcRenderer;
 const { Content } = Layout;
 
 const View: FC = (props: any) => {
-  const [src, setSrc] = useState('/images/favicon.png');
+  const [src, setSrc] = useState('/images/icon.png');
   const [spinning, setSpinning] = useState(true);
 
   useEffect(() => {

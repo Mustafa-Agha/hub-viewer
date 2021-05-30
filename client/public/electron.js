@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain, screen, Tray, Menu } = require('electron');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const screenshot = require('screenshot-desktop');
+const isDev = require('electron-is-dev');
+const url = require('url');
 
 const server_secret =
   process.env.SERVER_SECRET || '3dcc17e8cf702ee00787c7086de31d';
@@ -11,7 +13,7 @@ const token = jwt.sign(
   server_secret
 );
 
-const socket = require('socket.io-client')('http://localhost:5000', {
+const socket = require('socket.io-client')('http://hubviewer.dev-hub.cf', {
   transportOptions: {
     polling: {
       extraHeaders: {
@@ -53,34 +55,38 @@ const SOCKET = Object.freeze({
   },
 });
 
-let interval = null;
-let win = null;
-let shareWin = null;
-let tray = null;
+let mainWindow;
+let shareWin;
+let interval;
+let tray;
 
 function createWindow() {
-  win = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1080,
     height: 500,
     title: 'HubViewer',
     darkTheme: true,
-    icon: path.join(__dirname + '/public/images/favicon.png'),
+    icon: path.join(__dirname + '/images/icon.png'),
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
     },
   });
 
-  win.loadURL('http://localhost:3000');
-  win.removeMenu();
-  win.center();
-  win.setMinimumSize(800, 500);
+  mainWindow.loadURL('http://localhost:3000');
+  mainWindow.removeMenu();
+  mainWindow.center();
+  mainWindow.setMinimumSize(800, 500);
+
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+  }
 
   const contextMenu = Menu.buildFromTemplate([
     {
       label: 'Show App',
       click: function () {
-        win.show();
+        mainWindow.show();
       },
     },
     {
@@ -92,24 +98,24 @@ function createWindow() {
     },
   ]);
 
-  tray = new Tray(path.join(__dirname + '/public/images/favicon.png'));
+  tray = new Tray(path.join(__dirname + '/images/icon.png'));
   tray.setContextMenu(contextMenu);
 
-  win.on('minimize', function (event) {
+  mainWindow.on('minimize', function (event) {
     event.preventDefault();
-    win.hide();
+    mainWindow.hide();
   });
 
-  win.on('close', function (event) {
+  mainWindow.on('close', function (event) {
     if (!app.isQuiting) {
       event.preventDefault();
-      win.hide();
+      mainWindow.hide();
     }
     return false;
   });
 
-  win.on('closed', () => {
-    win = null;
+  mainWindow.on('closed', () => {
+    mainWindow = null;
     if (shareWin) {
       shareWin.close();
     }
@@ -186,7 +192,6 @@ ipcMain.on(EVENTS.on.connection, (event, arg) => {
           });
 
           shareWin.loadURL('http://localhost:3000/share');
-
           shareWin.on('closed', () => {
             shareWin = null;
             clearInterval(interval);
@@ -238,7 +243,7 @@ ipcMain.on(EVENTS.on.connect, (event, arg) => {
           socket.on(SOCKET.on.verifyJoin, ({ id, client }) => {
             socket.emit(SOCKET.emit.joinUser, { id, client }, ({ status }) => {
               if (status === STATUS.success) {
-                win.loadURL('http://localhost:3000/view/' + arg['secret']);
+                mainWindow.loadURL('http://localhost:3000/view/' + arg['secret']);
               }
 
               if (status === STATUS.error) {

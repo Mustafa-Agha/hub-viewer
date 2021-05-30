@@ -76,7 +76,7 @@ const SideBar: FC = () => {
           icon={
             <Avatar
               size={18}
-              icon={<img src="/images/favicon.png" alt="logo" />}
+              icon={<img src="/images/icon.png" alt="logo" />}
             />
           }
         >

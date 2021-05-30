@@ -1,6 +1,6 @@
 import { render } from 'react-dom';
 import { Router, Switch, Route } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
+import { createHashHistory } from 'history';
 
 import { StoreContext } from 'hooks/context';
 import { store } from 'hooks/stores';
@@ -18,7 +18,7 @@ declare global {
   }
 }
 
-export const history = createBrowserHistory();
+export const history = createHashHistory();
 
 render(
   <StoreContext.Provider value={store}>
